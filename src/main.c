@@ -4,13 +4,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <time.h>
 
 const bool SUCCESS = true;
 const bool FAILURE = false;
 
+const int COMPUTER_PLAYER_NUM = 2;
 const char CORRESPONDING_CHARACTERS_TO_BOARD_NUMBERS[4] = {' ','X','O','/'};
 const int BOARD_SIZE = 3; //wenn man das ändert, muss man den DISALLOWED_POSITIONS_FOR_XY auch ändern!
-
 
 int returnCorrespondingNumber(char num) {
     if (num == 'A') {
@@ -132,14 +133,12 @@ bool checkIfDraw(int board[BOARD_SIZE][BOARD_SIZE]) {
             }
         }
         if (!freeSpace) {
-            printf("no free space left\n");
             return SUCCESS;
         }
-        for (int a = 0; a < BOARD_SIZE; a += 1) {//höhe //ToDo: machen dass das funktioniert??
+        for (int a = 0; a < BOARD_SIZE; a += 1) {//höhe //das ist eigentlich unnötig
             for (int b = 0; b < BOARD_SIZE; b += 1) {//breite
                 if (playerBoard[a][b] == c) {
                     if (evaluatePlacement(playerBoard, c, a, b)) {
-                        printf("no draw!");
                         return FAILURE;
                     }
                 }
@@ -204,6 +203,27 @@ int checkArguments(int row, int column) {
     return 0;
 }
 
+bool checkIf1Player() {
+    printf("Input a 0 if you want to play against the computer. 1 if you want the 2 player mode\n");
+    int num = 0;
+    scanf("%i%*c", &num);
+
+    return num;
+}
+
+bool checkForBotPlacement(int board[BOARD_SIZE][BOARD_SIZE]) {
+    const int a = rand()%3;
+    const int b = rand()%3;
+
+    if (board[a][b] == 0) {
+        board[a][b] = COMPUTER_PLAYER_NUM;
+
+        return evaluatePlacement(board, COMPUTER_PLAYER_NUM, a, b);
+    } else {
+        return checkForBotPlacement(board);
+    }
+}
+
 bool checkForPlacement(int board[BOARD_SIZE][BOARD_SIZE], int currentPlayerNumber) {
     int row;
     char column;
@@ -233,12 +253,16 @@ bool checkForPlacement(int board[BOARD_SIZE][BOARD_SIZE], int currentPlayerNumbe
 }
 
 bool main(void) {
+    srand(time(NULL)); //seed für rnd setzen
+
     int board[BOARD_SIZE][BOARD_SIZE]; //Möglichkeiten: 0: nix, 1: Spieler1, 2: Spieler2
     for (int a = 0; a < BOARD_SIZE; a++) {
         for (int b = 0; b < BOARD_SIZE; b++) {
             board[a][b] = 0; //Auf default werte setzen
         }
     }
+
+    int playerMode = checkIf1Player();
 
     int currentPlayer = 0;
     displayBoard(board);
@@ -249,14 +273,18 @@ bool main(void) {
         if (currentPlayer == 3) {
             currentPlayer = 1;
         }
-        printf("[%c] Player %i is on turn! Please input:\n", CORRESPONDING_CHARACTERS_TO_BOARD_NUMBERS[currentPlayer], currentPlayer);
-        gameRunning = !checkForPlacement(board, currentPlayer);
+
+        if (playerMode == 0 && currentPlayer == COMPUTER_PLAYER_NUM) {
+            gameRunning = !checkForBotPlacement(board);
+        } else {
+            printf("[%c] Player %i is on turn! Please input:\n", CORRESPONDING_CHARACTERS_TO_BOARD_NUMBERS[currentPlayer], currentPlayer);
+            gameRunning = !checkForPlacement(board, currentPlayer);
+        }
 
         displayBoard(board);
 
         bool draw = checkIfDraw(board);
-        if (draw) {
-            printf("returned draw \n");
+        if (draw && gameRunning) { //gamerunning, weil sonst jeder vertikale win als draw zählt
             currentPlayer = 0;
             gameRunning = false;
         }
