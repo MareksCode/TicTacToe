@@ -1,8 +1,7 @@
-// © MareksCode 2024
+// © MareksCode 2025
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <stdbool.h>
 #include <time.h>
 
@@ -61,26 +60,22 @@ bool evaluatePlacement(int board[BOARD_SIZE][BOARD_SIZE], int currentPlayerNumbe
     for (int a = 0; a < BOARD_SIZE; a += 1) {
         if (board[getLimit(columnNum + a)][row] != currentPlayerNumber) {
             x = false;
-            //if ((a!=BOARD_SIZE-1)&&(getLimit(columnNum + a) == columnNum)) {x = true;}
         }
         if (board[columnNum][getLimit(row + a)] != currentPlayerNumber) {
             y = false;
-            //if ((a!=BOARD_SIZE-1)&&(getLimit(row + a) == row)) {y = true;}
-        }
+           }
         if (disallowed[columnNum][row] == 0) { //wenn erlaubt
             if (yxAllowed[columnNum][row] == 1) {
                 if (board[getLimit(columnNum + a)][getLimit(row + a)] != currentPlayerNumber) {
                     xy = false;
-                    //if ((a!=BOARD_SIZE-1)&&(getLimit(row + a) == row)&&(getLimit(columnNum + a) == columnNum)) {xy = true;}
-                }
+                  }
             } else {
                 xy = false;
             }
             if (xyAllowed[columnNum][row] == 1) {
                 if (board[getLimit(columnNum + a)][getLimit(row - a)] != currentPlayerNumber) {
                     yx = false;
-                    //if ((a!=BOARD_SIZE-1)&&(getLimit(row - a) == row)&&(getLimit(columnNum + a) == columnNum)) {y = true;}
-                }
+                    }
             } else {
                 yx = false;
             }
@@ -89,10 +84,6 @@ bool evaluatePlacement(int board[BOARD_SIZE][BOARD_SIZE], int currentPlayerNumbe
             yx = false;
         }
     }
-    //printf("%d\n", x);
-    //printf("%d\n", y);
-    //printf("%d\n", xy);
-    //printf("%d\n", yx);
 
     if (x) {
         for (int a = 0; a <= BOARD_SIZE; a += 1) {
@@ -149,51 +140,6 @@ bool checkIfDraw(int board[BOARD_SIZE][BOARD_SIZE]) {
     return SUCCESS;
 }
 
-bool evaluatePlacementOLD(int board[BOARD_SIZE][BOARD_SIZE], int currentPlayerNumber, int columnNum, int row) {
-    int middle = board[columnNum][row];
-    //printf("middle:%i\n", middle);
-    int north = board[getLimit(columnNum+1)][row];
-   // printf("north:%i\n", north);
-    int east = board[columnNum][getLimit(row+1)];
-    //printf("east:%i\n", east);
-    int south = board[getLimit(columnNum-1)][row];
-    //printf("south:%i\n", south);
-    int west = board[columnNum][getLimit(row-1)];
-    //printf("west:%i\n", west);
-    int northwest = board[getLimit(columnNum+1)][getLimit(row-1)];
-    //printf("northwest:%i\n", northwest);
-    int northeast = board[getLimit(columnNum+1)][getLimit(row+1)];
-    printf("northeast:%i\n", northeast);
-    int southeast = board[getLimit(columnNum-1)][getLimit(row+1)];
-    //printf("southeast:%i\n", southeast);
-    int southwest = board[getLimit(columnNum-1)][getLimit(row-1)];
-    printf("southwest:%i\n", southwest);
-
-    bool vertical = north == currentPlayerNumber && south == currentPlayerNumber; //mitte ist nicht nötig, weil sie von der funk vorrausgesetzt wird
-    bool horizontal = east == currentPlayerNumber && west == currentPlayerNumber;
-    bool oblique1 = northwest == currentPlayerNumber && southeast == currentPlayerNumber;
-    bool oblique2 = northeast == currentPlayerNumber && southwest == currentPlayerNumber;
-
-    if (vertical) {
-        printf("vertical win\n");
-        return SUCCESS;
-    }
-    if (horizontal) {
-        printf("horizontal win\n");
-        return SUCCESS;
-    }
-    if (oblique1) {
-        printf("oblique1 win\n");
-        return SUCCESS;
-    }
-    if (oblique2) {
-        printf("oblique2 win\n");
-        return SUCCESS;
-    }
-
-    return FAILURE;
-}
-
 int checkArguments(int row, int column) {
     if (row >= 0 && row < BOARD_SIZE) {
         if (column >= 0 && column < BOARD_SIZE) {
@@ -230,7 +176,6 @@ bool checkForPlacement(int board[BOARD_SIZE][BOARD_SIZE], int currentPlayerNumbe
 
     if (scanf("%c%i%*c", &column, &row) == 2) {//mega der scheiß; ToDo: replacen
         const int columnNum = returnCorrespondingNumber(column);
-       // printf("calc: %i%i\n", columnNum, row);
 
         if (checkArguments(row, columnNum) == 0) {
             printf("wrong input! Please try typing in the following format:\ncolumn+row -> for ex. A1 or C2\n");
